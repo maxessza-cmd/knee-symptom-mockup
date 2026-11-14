@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>แบบคัดกรองอาการเข่า</title>
+<style>
+  :root {
+    --ink: #1c1915;
+    --muted: #5c564c;
+    --line: #e4ddd0;
+    --paper: #f6f3ec;
+    --card: #fffdf9;
+    --accent: #1f6b5a;
+    --accent-soft: #e7f3ef;
+    --warn-bg: #fff6e5;
+    --warn-line: #e2b15a;
+    --warn-ink: #6a4a10;
+    --bar: #ddd6c8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Leelawadee UI", "Tahoma", "Segoe UI", sans-serif;
+    line-height: 1.55;
+  }
+  main {
+    width: min(920px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 28px 0 64px;
+  }
+  h1 {
+    margin: 0 0 8px;
+    font-size: 1.8rem;
+    line-height: 1.3;
+  }
+  h2 {
+    margin: 0 0 12px;
+    font-size: 1.25rem;
+  }
+  h3 {
+    margin: 0 0 8px;
+    font-size: 1.05rem;
+  }
+  p { margin: 0 0 10px; }
+  .lead { color: var(--muted); margin-bottom: 16px; }
+  .banner {
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-line);
+    color: var(--warn-ink);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+  }
+  .banner strong { display: block; margin-bottom: 4px; }
+  section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .formula {
+    background: #f3f7f6;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 8px;
+  }
+  fieldset {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin: 0 0 12px;
+    padding: 12px 14px 8px;
+  }
+  legend {
+    padding: 0 6px;
+    font-weight: 700;
+  }
+  label.symptom {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 8px 4px;
+    cursor: pointer;
+  }
+  label.symptom input {
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    accent-color: var(--accent);
+    flex: 0 0 auto;
+  }
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  button {
+    font: inherit;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 14px;
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+  button:focus-visible, summary:focus-visible, label.symptom:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .result {
+    border-top: 1px solid var(--line);
+    padding: 12px 0;
+  }
+  .result:first-of-type { border-top: 0; padding-top: 0; }
+  .result-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: baseline;
+  }
+  .score {
+    font-variant-numeric: tabular-nums;
+    font-size: 1.35rem;
+    font-weight: 700;
+  }
+  .meta { color: var(--muted); font-size: 0.92rem; }
+  .bar {
+    height: 8px;
+    background: var(--bar);
+    border-radius: 999px;
+    margin: 8px 0;
+    overflow: hidden;
+  }
+  .bar span {
+    display: block;
+    height: 100%;
+    background: #8d867b;
+    width: 0;
+  }
+  .result.pass .bar span { background: var(--accent); }
+  .badge {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 0.82rem;
+    background: #efeae1;
+    color: var(--muted);
+  }
+  .result.pass .badge {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .plan {
+    border: 1px solid #cfe3dc;
+    background: #f7fbf9;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+  }
+  .plan:last-child { margin-bottom: 0; }
+  .plan ul { margin: 8px 0 0; padding-left: 1.2rem; }
+  .empty { color: var(--muted); }
+  details { margin-top: 8px; }
+  summary { cursor: pointer; font-weight: 700; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.95rem;
+  }
+  th, td {
+    text-align: left;
+    vertical-align: top;
+    border-top: 1px solid var(--line);
+    padding: 8px 6px;
+  }
+  th { color: var(--muted); font-weight: 700; }
+  code { font-family: Consolas, "Leelawadee UI", monospace; }
+</style>
+</head>
+<body>
+<main>
+  <h1>แบบคัดกรองอาการเข่า</h1>
+  <p class="lead">เลือกอาการที่มี แล้วดูว่าอาการนั้นจับคู่กับป้ายใดในไฟล์ชุดข้อมูล ป้ายที่ได้คะแนนตั้งแต่ 0.40 จะมีแผนฟื้นตัวตัวอย่าง</p>
+  <div class="banner">
+    <strong>หน้านี้เป็นแบบจำลองสำหรับสาธิต</strong>
+    ไม่ใช่การวินิจฉัยโรค และไม่ใช่ใบสั่งรักษา ตัวเลขคำนวณจากอาการที่เลือกตามกติกาในหน้านี้ ไม่ได้เอาจำนวนครั้งที่เป็น 0 หรือ 1 ในไฟล์มาแสดง และไม่ได้บอกว่าเข่านี้เป็นป้ายนั้นจริง
+  </div>
+
+  <section>
+    <h2>ป้ายในไฟล์</h2>
+    <p>ป้ายมาจาก 12 คอลัมน์ในไฟล์ <code>train.csv</code> แต่ละช่องในไฟล์เป็นค่าว่าง, 0 หรือ 1 ชื่อคอลัมน์เรียงตามไฟล์คือ ACL, MCL, Medial Meniscus, Lateral Meniscus, Medial OA, Lateral OA, PF OA, Effusion, Synovitis, Baker's, Contusion, Fracture</p>
+    <p>คำไทยข้างผลลัพธ์เป็นคำอธิบายของชื่อคอลัมน์นั้น จากเอกสารสรุปในโฟลเดอร์ชุดข้อมูล</p>
+    <div class="formula">
+      <p>คะแนนของแต่ละป้าย = น้ำหนักของอาการที่ถูกเลือกและจับคู่กับป้ายนั้น ÷ น้ำหนักเต็มของป้ายนั้น</p>
+      <p>น้ำหนักเต็มคือผลรวมน้ำหนักของอาการทุกข้อที่จับคู่กับป้ายนั้น แม้ยังไม่ได้เลือก คะแนนอยู่ระหว่าง 0 กับ 1 แสดงทศนิยมสองตำแหน่ง ตั้งแต่ 0.40 ขึ้นไปจึงแสดงแผนฟื้นตัว</p>
+      <p>ตัวอย่าง อาการ “บิดเข่าแล้วมีเสียงดัง แล้วบวมในวันเดียวกัน” ให้น้ำหนัก 3 แก่ป้าย ACL น้ำหนักเต็มของ ACL คือ 5 ถ้าเลือกแค่อาการนี้ คะแนนคือ 3 ÷ 5 = 0.60</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="toolbar">
+      <h2>เลือกอาการ</h2>
+      <button type="button" id="clear">ล้างอาการที่เลือก</button>
+    </div>
+    <p class="meta" id="picked">ยังไม่ได้เลือกอาการ</p>
+    <div id="form"></div>
+  </section>
+
+  <section>
+    <h2>ผลจับคู่กับป้าย</h2>
+    <div id="results" aria-live="polite"></div>
+  </section>
+
+  <section>
+    <h2>แผนฟื้นตัวของป้ายที่คะแนนตั้งแต่ 0.40</h2>
+    <div class="banner">
+      <strong>ข้อความด้านล่างเป็นตัวอย่างสำหรับสาธิต</strong>
+      ไม่ใช่แผนรักษาของใครคนหนึ่ง ถ้าปวดมาก เดินลงน้ำหนักไม่ได้ เข่าผิดรูป บวมเร็ว หรือข้อร้อน ให้ไปพบแพทย์
+    </div>
+    <div id="plans"></div>
+  </section>
+
+  <section>
+    <details>
+      <summary>กติกาจับคู่น้ำหนักทั้งหมด</summary>
+      <div id="rules"></div>
+    </details>
+  </section>
+</main>
+<script>
+const labels = [
+  {
+    id: "ACL",
+    column: "ACL",
+    thai: "เอ็นไขว้หน้าฉีก",
+    steps: [
+      "ช่วงแรกเลี่ยงการบิดเข่าและการเปลี่ยนทิศทางเร็ว",
+      "ถ้าบวม ให้พักการใช้ขาข้างนั้น และประคบเย็นเป็นช่วงสั้น ๆ",
+      "เมื่อปวดลด ค่อย ๆ งอและเหยียดเข่าเท่าที่ไม่แสบมาก",
+      "ถ้าเข่าหลวมบ่อยหรือบวมเร็ว ให้ไปพบแพทย์ก่อนเริ่มฝึกหนัก"
+    ]
+  },
+  {
+    id: "MCL",
+    column: "MCL",
+    thai: "เอ็นไขว้ในฉีก",
+    steps: [
+      "เลี่ยงท่าที่ดึงด้านในเข่า เช่น การบิดออกด้านข้าง",
+      "ช่วงเจ็บให้เดินระยะสั้นบนพื้นเรียบ",
+      "ถ้าเดินแล้วปวดมากขึ้นให้พัก แล้วค่อยเพิ่มระยะเมื่อปวดไม่เพิ่ม",
+      "ถ้าข้อบวมมากหรือเดินลงน้ำหนักไม่ได้ ให้พบแพทย์"
+    ]
+  },
+  {
+    id: "MM",
+    column: "Medial Meniscus",
+    thai: "หมอนรองเข่าด้านในฉีก",
+    steps: [
+      "เลี่ยงการย่อลึกและการบิดเข่าขณะลงน้ำหนัก",
+      "ถ้าเข่าล็อกจนเหยียดไม่สุด อย่าฝืนดึงเอง",
+      "พักจากกิจกรรมที่ทำให้สะดุด แล้วไปตรวจก่อนกลับไปเปลี่ยนทิศทางเร็ว",
+      "เมื่ออาการสงบ ค่อยเดินบนพื้นเรียบและงอเข่าในช่วงที่ไม่ปวดแปลบ"
+    ]
+  },
+  {
+    id: "LM",
+    column: "Lateral Meniscus",
+    thai: "หมอนรองเข่าด้านนอกฉีก",
+    steps: [
+      "เลี่ยงการบิดเข่าและการย่อลึก โดยเฉพาะด้านนอกข้อ",
+      "ถ้ามีอาการล็อก ให้หยุดกิจกรรมที่ทำให้สะดุด",
+      "ไปตรวจก่อนกลับไปวิ่งหรือเปลี่ยนทิศทางเร็ว",
+      "เมื่อเดินได้โดยไม่สะดุด ค่อยเพิ่มระยะบนพื้นเรียบ"
+    ]
+  },
+  {
+    id: "MOA",
+    column: "Medial OA",
+    thai: "ข้อเข่าเสื่อมด้านใน",
+    steps: [
+      "แบ่งการเดินเป็นช่วงสั้น และเลี่ยงการยืนค้างนาน",
+      "ถ้าขึ้นบันไดแล้วปวดด้านในมากขึ้น ให้ลดจำนวนเที่ยวแล้วพัก",
+      "ค่อยกลับมาเดินเมื่อปวดไม่เพิ่มจากเดิม",
+      "ถ้าข้อบวมหรือปวดตอนกลางคืน ให้พบแพทย์"
+    ]
+  },
+  {
+    id: "LOA",
+    column: "Lateral OA",
+    thai: "ข้อเข่าเสื่อมด้านนอก",
+    steps: [
+      "ลดการเดินลงเนินซ้ำ ๆ ถ้าปวดด้านนอกเข่า",
+      "พักเป็นช่วง แล้วค่อยกลับมาเดินสั้นลงเมื่อปวดลด",
+      "เลี่ยงการยืนเอียงน้ำหนักไปขาข้างที่ปวดนาน ๆ",
+      "ถ้าข้อบวมหรือเดินลำบากขึ้น ให้พบแพทย์"
+    ]
+  },
+  {
+    id: "PF",
+    column: "PF OA",
+    thai: "ข้อเข่าเสื่อมด้านหน้าระหว่างลูกสะบ้ากับร่องกระดูก",
+    steps: [
+      "เลี่ยงการนั่งงอเข่านาน และการขึ้นลงบันไดซ้ำ",
+      "เวลาลุก ให้ใช้ขาทั้งสองข้าง และไม่ให้เข่าเลยปลายเท้ามาก",
+      "ถ้าปวดด้านหน้าเวลาเดินลง ให้ลดทางชันและพัก",
+      "ถ้าปวดด้านหน้าเข่าทุกครั้งที่ลุกหรือเดินลง ให้พบแพทย์"
+    ]
+  },
+  {
+    id: "EFF",
+    column: "Effusion",
+    thai: "น้ำในข้อมากพอควร",
+    steps: [
+      "ช่วงเข่าบวมให้พักการวิ่ง และยกขาเป็นพัก ๆ",
+      "ประคบเย็นเป็นช่วงสั้น ๆ อย่าฝืนงอสุดถ้าตึงมาก",
+      "เมื่อบวมลด ค่อยเพิ่มการเดินบนพื้นเรียบ",
+      "ถ้าบวมเร็ว ร่วมกับไข้ หรือเดินไม่ได้ ให้พบแพทย์"
+    ]
+  },
+  {
+    id: "SYN",
+    column: "Synovitis",
+    thai: "เยื่อบุข้ออักเสบ",
+    steps: [
+      "ลดการใช้งานที่ทำให้เข่าร้อนและบวม",
+      "พักจากท่าย่อซ้ำ จนกว่าความร้อนและปวดตอนพักจะลด",
+      "ค่อยขยับข้อช้า ๆ เท่าที่ไม่บวมเพิ่มขึ้น",
+      "ถ้าข้อแดง ร้อนมาก หรือปวดตอนพักตลอด ให้ไปตรวจ"
+    ]
+  },
+  {
+    id: "BAK",
+    column: "Baker's",
+    thai: "ถุงน้ำด้านหลังเข่าขนาดปานกลางถึงใหญ่",
+    steps: [
+      "เลี่ยงการเหยียดสุดซ้ำ ถ้าตึงด้านหลังเข่า",
+      "อย่ากดหรือเจาะก้อนเอง",
+      "เมื่อตึงลด ค่อยเหยียดเข่าช้า ๆ เท่าที่ไม่ปวดแปลบ",
+      "ถ้าก้อนโตเร็ว ปวดน่อง หรือขาบวมลงไปถึงน่อง ให้พบแพทย์"
+    ]
+  },
+  {
+    id: "CON",
+    column: "Contusion",
+    thai: "กระดูกช้ำ โดยไม่มีเส้นแตก",
+    steps: [
+      "พักจุดที่กระแทก และเลี่ยงการกระแทกซ้ำ",
+      "ประคบเย็นช่วงแรก",
+      "ถ้ายังเดินได้ ให้ลงน้ำหนักเท่าที่ปวดไม่เพิ่ม",
+      "ถ้าปวดกระดูกมากขึ้นหรือลงน้ำหนักไม่ได้ ให้ไปตรวจ เพราะแบบจำลองนี้แยกกระดูกช้ำกับกระดูกหักไม่ได้"
+    ]
+  },
+  {
+    id: "FRA",
+    column: "Fracture",
+    thai: "กระดูกหักใหม่",
+    steps: [
+      "ถ้าลงน้ำหนักไม่ได้หรือขาผิดรูป ให้หยุดเดินด้วยขานั้น",
+      "ไปพบแพทย์หรือห้องฉุกเฉิน ไม่เริ่มออกกำลังเอง",
+      "ระหว่างรอตรวจ อย่าฝืนงอหรือดึงเข่า",
+      "ข้อความนี้ไม่มีท่าฝึก เพราะป้ายนี้หมายถึงกระดูกหักใหม่"
+    ]
+  }
+];
+
+const groups = [
+  {
+    title: "หลังบิดเข่าหรือเปลี่ยนทิศ",
+    items: [
+      { id: "pop", text: "บิดเข่าแล้วมีเสียงดัง แล้วบวมในวันเดียวกัน", weights: { ACL: 3 } },
+      { id: "give", text: "เปลี่ยนทิศทางแล้วเข่าหลวมหรือทรุด", weights: { ACL: 2 } },
+      { id: "inner-twist", text: "บิดหรือย่อแล้วเจ็บด้านในข้อ", weights: { MM: 3 } },
+      { id: "outer-twist", text: "บิดหรือย่อแล้วเจ็บด้านนอกข้อ", weights: { LM: 3 } },
+      { id: "lock", text: "เข่าล็อกหรือสะดุด เหยียดหรืองอไม่สุดเป็นพัก ๆ", weights: { MM: 2, LM: 2 } }
+    ]
+  },
+  {
+    title: "หลังถูกกระแทกหรือล้ม",
+    items: [
+      { id: "mcl-hit", text: "ถูกกระแทกด้านนอกเข่า แล้วเจ็บด้านใน", weights: { MCL: 3 } },
+      { id: "bone", text: "กระแทกเข่าโดยตรง ยังเดินได้ แต่กดโดนกระดูกแล้วเจ็บ", weights: { CON: 3 } },
+      { id: "nowalk", text: "หลังล้มหรือกระแทกแรง ลงน้ำหนักที่ขานั้นไม่ได้", weights: { FRA: 2 } },
+      { id: "deform", text: "หลังอุบัติเหตุ เข่าหรือขาดูผิดรูป", weights: { FRA: 2 } },
+      { id: "severe", text: "ปวดรุนแรงทันทีหลังกระแทก จนแทบขยับเข่าไม่ได้", weights: { FRA: 1, CON: 1 } }
+    ]
+  },
+  {
+    title: "ตำแหน่งที่เจ็บ และอาการที่เป็นมานาน",
+    items: [
+      { id: "press-in", text: "กดตามแนวด้านในข้อแล้วเจ็บ", weights: { MCL: 1, MM: 2 } },
+      { id: "inner-chronic", text: "ปวดด้านในเข่ามานาน และเดินแล้วปวดขึ้น", weights: { MOA: 3 } },
+      { id: "outer-chronic", text: "ปวดด้านนอกเข่ามานาน และเดินแล้วปวดขึ้น", weights: { LOA: 3 } },
+      { id: "stiff", text: "หลังนั่งนานหรือตื่นนอน เข่าติด ต้องขยับก่อน", weights: { MOA: 1, LOA: 1, PF: 1 } },
+      { id: "stairs", text: "เจ็บด้านหน้าเข่าเวลาขึ้นหรือลงบันได", weights: { PF: 3 } },
+      { id: "sit", text: "นั่งงอเข่านานแล้วลุกขึ้นเจ็บด้านหน้า", weights: { PF: 3 } },
+      { id: "lump", text: "คลำได้ก้อนนิ่มด้านหลังพับเข่า", weights: { BAK: 3 } },
+      { id: "back", text: "เหยียดแล้วตึงหรือเจ็บด้านหลังเข่า", weights: { BAK: 3 } }
+    ]
+  },
+  {
+    title: "บวม ร้อน และตึงในข้อ",
+    items: [
+      { id: "swell", text: "เข่าบวม มองเห็นว่าใหญ่กว่าอีกข้าง", weights: { EFF: 3 } },
+      { id: "tight", text: "เหยียดสุดแล้วรู้สึกตึงในข้อ", weights: { EFF: 1, BAK: 1 } },
+      { id: "move-pain", text: "ข้อบวมและเจ็บเวลาขยับ", weights: { EFF: 1, SYN: 2 } },
+      { id: "warm", text: "เข่าอุ่น และปวดแม้ตอนไม่ได้ขยับ", weights: { SYN: 3 } }
+    ]
+  }
+];
+
+const symptoms = groups.flatMap((group) => group.items);
+const labelById = Object.fromEntries(labels.map((label) => [label.id, label]));
+const maxWeight = {};
+labels.forEach((label) => { maxWeight[label.id] = 0; });
+symptoms.forEach((symptom) => {
+  Object.entries(symptom.weights).forEach(([id, weight]) => {
+    maxWeight[id] += weight;
+  });
+});
+
+const form = document.getElementById("form");
+const results = document.getElementById("results");
+const plans = document.getElementById("plans");
+const picked = document.getElementById("picked");
+const rules = document.getElementById("rules");
+
+groups.forEach((group) => {
+  const field = document.createElement("fieldset");
+  const legend = document.createElement("legend");
+  legend.textContent = group.title;
+  field.appendChild(legend);
+  group.items.forEach((symptom) => {
+    const label = document.createElement("label");
+    label.className = "symptom";
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.value = symptom.id;
+    input.addEventListener("change", render);
+    const text = document.createElement("span");
+    text.textContent = symptom.text;
+    label.append(input, text);
+    field.appendChild(label);
+  });
+  form.appendChild(field);
+});
+
+const ruleTable = document.createElement("table");
+ruleTable.innerHTML = "<thead><tr><th>อาการ</th><th>น้ำหนักที่บวกให้ป้าย</th></tr></thead>";
+const tbody = document.createElement("tbody");
+symptoms.forEach((symptom) => {
+  const row = document.createElement("tr");
+  const symptomCell = document.createElement("td");
+  symptomCell.textContent = symptom.text;
+  const weightCell = document.createElement("td");
+  weightCell.textContent = Object.entries(symptom.weights).map(([id, weight]) => {
+    const label = labelById[id];
+    return label.column + " +" + weight;
+  }).join(", ");
+  row.append(symptomCell, weightCell);
+  tbody.appendChild(row);
+});
+ruleTable.appendChild(tbody);
+const maxLine = document.createElement("p");
+maxLine.textContent = "น้ำหนักเต็มของแต่ละป้าย: " + labels.map((label) => label.column + " " + maxWeight[label.id]).join(", ");
+rules.append(maxLine, ruleTable);
+
+document.getElementById("clear").addEventListener("click", () => {
+  form.querySelectorAll("input").forEach((input) => { input.checked = false; });
+  render();
+});
+
+function selectedSymptoms() {
+  const ids = new Set(Array.from(form.querySelectorAll("input:checked")).map((input) => input.value));
+  return symptoms.filter((symptom) => ids.has(symptom.id));
+}
+
+function scoreOf(id, chosen) {
+  let earned = 0;
+  const parts = [];
+  chosen.forEach((symptom) => {
+    const weight = symptom.weights[id] || 0;
+    if (weight > 0) {
+      earned += weight;
+      parts.push(symptom.text + " +" + weight);
+    }
+  });
+  const total = maxWeight[id];
+  return { earned, total, score: total === 0 ? 0 : earned / total, parts };
+}
+
+function render() {
+  const chosen = selectedSymptoms();
+  picked.textContent = chosen.length === 0
+    ? "ยังไม่ได้เลือกอาการ"
+    : "เลือกแล้ว " + chosen.length + " อาการ";
+
+  results.replaceChildren();
+  const passing = [];
+  labels.forEach((label) => {
+    const calc = scoreOf(label.id, chosen);
+    const shown = calc.score.toFixed(2);
+    const pass = calc.score >= 0.4;
+    if (pass) passing.push({ label, calc, shown });
+
+    const card = document.createElement("article");
+    card.className = pass ? "result pass" : "result";
+    const head = document.createElement("div");
+    head.className = "result-head";
+    const title = document.createElement("h3");
+    title.textContent = label.thai;
+    const score = document.createElement("div");
+    score.className = "score";
+    score.textContent = shown;
+    head.append(title, score);
+
+    const column = document.createElement("p");
+    column.className = "meta";
+    column.textContent = "ชื่อคอลัมน์ในไฟล์: " + label.column;
+
+    const bar = document.createElement("div");
+    bar.className = "bar";
+    const fill = document.createElement("span");
+    fill.style.width = Math.round(calc.score * 100) + "%";
+    bar.appendChild(fill);
+
+    const math = document.createElement("p");
+    math.textContent = "น้ำหนัก " + calc.earned + " จาก " + calc.total + " คะแนน " + shown;
+
+    const badge = document.createElement("p");
+    const mark = document.createElement("span");
+    mark.className = "badge";
+    mark.textContent = pass ? "ถึง 0.40 แสดงแผนฟื้นตัวด้านล่าง" : "ยังไม่ถึง 0.40";
+    badge.appendChild(mark);
+
+    card.append(head, column, bar, math, badge);
+    if (calc.parts.length) {
+      const from = document.createElement("p");
+      from.className = "meta";
+      from.textContent = "อาการที่นับ: " + calc.parts.join(" · ");
+      card.appendChild(from);
+    }
+    results.appendChild(card);
+  });
+
+  plans.replaceChildren();
+  if (!passing.length) {
+    const empty = document.createElement("p");
+    empty.className = "empty";
+    empty.textContent = chosen.length
+      ? "ยังไม่มีป้ายที่ได้ตั้งแต่ 0.40 จึงยังไม่แสดงแผนฟื้นตัว"
+      : "เลือกอาการด้านบน แล้วแผนฟื้นตัวจะปรากฏเฉพาะป้ายที่คะแนนถึง 0.40";
+    plans.appendChild(empty);
+    return;
+  }
+  passing.forEach(({ label, shown }) => {
+    const card = document.createElement("article");
+    card.className = "plan";
+    const title = document.createElement("h3");
+    title.textContent = label.thai + " · " + label.column + " · คะแนน " + shown;
+    const list = document.createElement("ul");
+    label.steps.forEach((step) => {
+      const item = document.createElement("li");
+      item.textContent = step;
+      list.appendChild(item);
+    });
+    const note = document.createElement("p");
+    note.className = "meta";
+    note.textContent = "ข้อความนี้เป็นตัวอย่างในแบบจำลอง ไม่ใช่คำสั่งรักษา";
+    card.append(title, list, note);
+    plans.appendChild(card);
+  });
+}
+
+render();
+</script>
+</body>
+</html>
