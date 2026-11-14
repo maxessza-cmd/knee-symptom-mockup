@@ -4,234 +4,318 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>แบบคัดกรองอาการเข่า</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
 <style>
   :root {
-    --ink: #1c1915;
-    --muted: #5c564c;
-    --line: #e4ddd0;
-    --paper: #f6f3ec;
-    --card: #fffdf9;
-    --accent: #1f6b5a;
-    --accent-soft: #e7f3ef;
-    --warn-bg: #fff6e5;
-    --warn-line: #e2b15a;
-    --warn-ink: #6a4a10;
-    --bar: #ddd6c8;
+    --bg: #070b12;
+    --panel: #101820;
+    --panel-2: #162230;
+    --line: rgba(140, 210, 220, 0.16);
+    --text: #e7f2f6;
+    --muted: #93a8b6;
+    --accent: #2ec4b6;
+    --accent-2: #8ef0e4;
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+    --radius: 16px;
+    --max: 1180px;
+    --font: "Noto Sans Thai", "Leelawadee UI", sans-serif;
+    --display: "Space Grotesk", "Noto Sans Thai", sans-serif;
   }
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
     margin: 0;
-    color: var(--ink);
-    background: var(--paper);
-    font-family: "Leelawadee UI", "Tahoma", "Segoe UI", sans-serif;
-    line-height: 1.55;
+    min-height: 100vh;
+    font-family: var(--font);
+    color: var(--text);
+    background:
+      radial-gradient(900px 420px at 0% -10%, rgba(46, 196, 182, 0.16), transparent 55%),
+      radial-gradient(700px 380px at 100% 0%, rgba(70, 120, 190, 0.18), transparent 50%),
+      var(--bg);
+    line-height: 1.6;
   }
-  main {
-    width: min(920px, calc(100% - 32px));
-    margin: 0 auto;
-    padding: 28px 0 64px;
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(46, 196, 182, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(46, 196, 182, 0.04) 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: linear-gradient(180deg, #000 0%, transparent 80%);
   }
-  h1 {
-    margin: 0 0 8px;
-    font-size: 1.8rem;
-    line-height: 1.3;
+  a { color: var(--accent-2); text-decoration: none; }
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: blur(16px);
+    background: rgba(7, 11, 18, 0.78);
+    border-bottom: 1px solid var(--line);
   }
-  h2 {
-    margin: 0 0 12px;
-    font-size: 1.25rem;
+  .nav-wrap, .hero, .workspace {
+    width: min(var(--max), calc(100% - 32px));
+    margin-inline: auto;
   }
-  h3 {
-    margin: 0 0 8px;
-    font-size: 1.05rem;
-  }
-  p { margin: 0 0 10px; }
-  .lead { color: var(--muted); margin-bottom: 16px; }
-  .banner {
-    background: var(--warn-bg);
-    border: 1px solid var(--warn-line);
-    color: var(--warn-ink);
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin-bottom: 18px;
-  }
-  .banner strong { display: block; margin-bottom: 4px; }
-  section {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 18px;
-    margin-bottom: 16px;
-  }
-  .formula {
-    background: #f3f7f6;
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-top: 8px;
-  }
-  fieldset {
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    margin: 0 0 12px;
-    padding: 12px 14px 8px;
-  }
-  legend {
-    padding: 0 6px;
-    font-weight: 700;
-  }
-  label.symptom {
+  .nav-wrap {
+    height: 68px;
     display: flex;
-    gap: 10px;
-    align-items: flex-start;
-    padding: 8px 4px;
-    cursor: pointer;
-  }
-  label.symptom input {
-    width: 18px;
-    height: 18px;
-    margin-top: 3px;
-    accent-color: var(--accent);
-    flex: 0 0 auto;
-  }
-  .toolbar {
-    display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: 16px;
+  }
+  .brand {
+    display: flex;
     align-items: center;
     gap: 12px;
-    flex-wrap: wrap;
+    color: inherit;
   }
-  button {
-    font: inherit;
-    background: #fff;
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: rgba(46, 196, 182, 0.14);
+    border: 1px solid var(--line);
+  }
+  .brand-mark svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: var(--accent-2);
+    stroke-width: 1.7;
+  }
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--display);
+    font-weight: 700;
+    line-height: 1.15;
+  }
+  .brand-text small {
+    font-family: var(--font);
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .nav-links { display: flex; gap: 18px; color: var(--muted); }
+  .hero { padding: 42px 0 8px; }
+  h1, h2, h3 { font-family: var(--display); font-weight: 700; }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    line-height: 1.25;
+  }
+  .note {
+    max-width: 720px;
+    margin: 12px 0 0;
+    color: var(--muted);
+  }
+  .combo-pills {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .combo-pills span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
     border: 1px solid var(--line);
     border-radius: 999px;
-    padding: 8px 14px;
+    background: rgba(16, 24, 32, 0.8);
+  }
+  .combo-pills b { font-family: var(--display); color: var(--accent-2); }
+  .combo-pills .plus { padding: 0; border: 0; background: none; color: var(--muted); }
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(320px, 440px) minmax(0, 1fr);
+    gap: 18px;
+    padding: 22px 0 56px;
+    align-items: start;
+  }
+  .panel {
+    background: rgba(16, 24, 32, 0.92);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+  }
+  .panel-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .panel-head h2 { margin: 0; font-size: 1.25rem; }
+  .panel-head p { margin: 4px 0 0; color: var(--muted); }
+  button {
+    font: inherit;
+    color: var(--text);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 8px 12px;
     cursor: pointer;
   }
   button:hover { border-color: var(--accent); }
-  button:focus-visible, summary:focus-visible, label.symptom:focus-within {
+  fieldset {
+    margin: 18px 0 0;
+    padding: 0;
+    border: 0;
+    min-inline-size: 0;
+  }
+  legend {
+    padding: 0;
+    margin-bottom: 10px;
+    font-family: var(--display);
+    font-weight: 700;
+  }
+  .symptom {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    cursor: pointer;
+  }
+  .symptom:has(input:checked) {
+    border-color: rgba(46, 196, 182, 0.7);
+    background: rgba(46, 196, 182, 0.1);
+  }
+  .symptom input { margin-top: 4px; accent-color: #14b8a6; }
+  .finding-list { display: grid; gap: 10px; }
+  .finding {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 12px;
+    align-items: center;
+  }
+  .finding-name { min-width: 0; }
+  .finding b { display: block; font-weight: 600; }
+  .finding em {
+    display: block;
+    font-style: normal;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  .score {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  .finding.pass .score { color: var(--accent-2); }
+  .meter {
+    grid-column: 1 / -1;
+    height: 8px;
+    border-radius: 99px;
+    background: #0c141c;
+    overflow: hidden;
+  }
+  .meter span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #1a8f86, var(--accent-2));
+  }
+  .finding.pass .meter span { background: linear-gradient(90deg, #d89a16, #ffe08a); }
+  .section-label {
+    margin: 22px 0 0;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .plans { display: grid; gap: 12px; margin-top: 12px; }
+  .plan {
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: rgba(8, 12, 18, 0.45);
+  }
+  .plan h3 { margin: 0; font-size: 1.05rem; }
+  .plan .score-tag {
+    font-family: var(--display);
+    color: var(--accent-2);
+    font-size: 0.95rem;
+  }
+  .plan ul { margin: 8px 0 0; padding-left: 1.15rem; }
+  .plan .meta { margin: 10px 0 0; color: var(--muted); font-size: 0.92rem; }
+  .empty {
+    margin-top: 16px;
+    padding: 28px 16px;
+    text-align: center;
+    color: var(--muted);
+    border: 1px dashed var(--line);
+    border-radius: 14px;
+  }
+  button:focus-visible, a:focus-visible, .symptom:focus-within {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
-  .result {
-    border-top: 1px solid var(--line);
-    padding: 12px 0;
+  @media (max-width: 900px) {
+    .workspace { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
   }
-  .result:first-of-type { border-top: 0; padding-top: 0; }
-  .result-head {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    align-items: baseline;
-  }
-  .score {
-    font-variant-numeric: tabular-nums;
-    font-size: 1.35rem;
-    font-weight: 700;
-  }
-  .meta { color: var(--muted); font-size: 0.92rem; }
-  .bar {
-    height: 8px;
-    background: var(--bar);
-    border-radius: 999px;
-    margin: 8px 0;
-    overflow: hidden;
-  }
-  .bar span {
-    display: block;
-    height: 100%;
-    background: #8d867b;
-    width: 0;
-  }
-  .result.pass .bar span { background: var(--accent); }
-  .badge {
-    display: inline-block;
-    border-radius: 999px;
-    padding: 2px 8px;
-    font-size: 0.82rem;
-    background: #efeae1;
-    color: var(--muted);
-  }
-  .result.pass .badge {
-    background: var(--accent-soft);
-    color: var(--accent);
-  }
-  .plan {
-    border: 1px solid #cfe3dc;
-    background: #f7fbf9;
-    border-radius: 12px;
-    padding: 12px 14px;
-    margin-bottom: 12px;
-  }
-  .plan:last-child { margin-bottom: 0; }
-  .plan ul { margin: 8px 0 0; padding-left: 1.2rem; }
-  .empty { color: var(--muted); }
-  details { margin-top: 8px; }
-  summary { cursor: pointer; font-weight: 700; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    font-size: 0.95rem;
-  }
-  th, td {
-    text-align: left;
-    vertical-align: top;
-    border-top: 1px solid var(--line);
-    padding: 8px 6px;
-  }
-  th { color: var(--muted); font-weight: 700; }
-  code { font-family: Consolas, "Leelawadee UI", monospace; }
 </style>
 </head>
 <body>
-<main>
-  <h1>แบบคัดกรองอาการเข่า</h1>
-  <p class="lead">เลือกอาการที่มี แล้วดูว่าอาการนั้นจับคู่กับป้ายใดในไฟล์ชุดข้อมูล ป้ายที่ได้คะแนนตั้งแต่ 0.40 จะมีแผนฟื้นตัวตัวอย่าง</p>
-  <div class="banner">
-    <strong>หน้านี้เป็นแบบจำลองสำหรับสาธิต</strong>
-    ไม่ใช่การวินิจฉัยโรค และไม่ใช่ใบสั่งรักษา ตัวเลขคำนวณจากอาการที่เลือกตามกติกาในหน้านี้ ไม่ได้เอาจำนวนครั้งที่เป็น 0 หรือ 1 ในไฟล์มาแสดง และไม่ได้บอกว่าเข่านี้เป็นป้ายนั้นจริง
+<header class="site-header">
+  <div class="nav-wrap">
+    <a class="brand" href="#top">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 14c3-8 6-10 8-10s5 2 8 10"/><circle cx="12" cy="12" r="3"/></svg>
+      </span>
+      <span class="brand-text">
+        คัดกรองเข่า
+        <small>แบบคัดกรอง + แผนฟื้นตัว</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="ส่วนของหน้า">
+      <a href="#screen">แบบคัดกรอง</a>
+      <a href="#result">ผลและแผน</a>
+    </nav>
   </div>
-
-  <section>
-    <h2>ป้ายในไฟล์</h2>
-    <p>ป้ายมาจาก 12 คอลัมน์ในไฟล์ <code>train.csv</code> แต่ละช่องในไฟล์เป็นค่าว่าง, 0 หรือ 1 ชื่อคอลัมน์เรียงตามไฟล์คือ ACL, MCL, Medial Meniscus, Lateral Meniscus, Medial OA, Lateral OA, PF OA, Effusion, Synovitis, Baker's, Contusion, Fracture</p>
-    <p>คำไทยข้างผลลัพธ์เป็นคำอธิบายของชื่อคอลัมน์นั้น จากเอกสารสรุปในโฟลเดอร์ชุดข้อมูล</p>
-    <div class="formula">
-      <p>คะแนนของแต่ละป้าย = น้ำหนักของอาการที่ถูกเลือกและจับคู่กับป้ายนั้น ÷ น้ำหนักเต็มของป้ายนั้น</p>
-      <p>น้ำหนักเต็มคือผลรวมน้ำหนักของอาการทุกข้อที่จับคู่กับป้ายนั้น แม้ยังไม่ได้เลือก คะแนนอยู่ระหว่าง 0 กับ 1 แสดงทศนิยมสองตำแหน่ง ตั้งแต่ 0.40 ขึ้นไปจึงแสดงแผนฟื้นตัว</p>
-      <p>ตัวอย่าง อาการ “บิดเข่าแล้วมีเสียงดัง แล้วบวมในวันเดียวกัน” ให้น้ำหนัก 3 แก่ป้าย ACL น้ำหนักเต็มของ ACL คือ 5 ถ้าเลือกแค่อาการนี้ คะแนนคือ 3 ÷ 5 = 0.60</p>
+</header>
+<main id="top">
+  <section class="hero">
+    <h1>แบบคัดกรองอาการเข่า</h1>
+    <p class="note">หน้านี้เป็น mockup สำหรับสาธิต ไม่ใช่การวินิจฉัยและไม่ใช่ใบสั่งรักษา</p>
+    <div class="combo-pills">
+      <span><b>01</b> แบบคัดกรอง</span>
+      <span class="plus" aria-hidden="true">+</span>
+      <span><b>02</b> แผนฟื้นตัว</span>
     </div>
   </section>
-
-  <section>
-    <div class="toolbar">
-      <h2>เลือกอาการ</h2>
-      <button type="button" id="clear">ล้างอาการที่เลือก</button>
-    </div>
-    <p class="meta" id="picked">ยังไม่ได้เลือกอาการ</p>
-    <div id="form"></div>
-  </section>
-
-  <section>
-    <h2>ผลจับคู่กับป้าย</h2>
-    <div id="results" aria-live="polite"></div>
-  </section>
-
-  <section>
-    <h2>แผนฟื้นตัวของป้ายที่คะแนนตั้งแต่ 0.40</h2>
-    <div class="banner">
-      <strong>ข้อความด้านล่างเป็นตัวอย่างสำหรับสาธิต</strong>
-      ไม่ใช่แผนรักษาของใครคนหนึ่ง ถ้าปวดมาก เดินลงน้ำหนักไม่ได้ เข่าผิดรูป บวมเร็ว หรือข้อร้อน ให้ไปพบแพทย์
-    </div>
-    <div id="plans"></div>
-  </section>
-
-  <section>
-    <details>
-      <summary>กติกาจับคู่น้ำหนักทั้งหมด</summary>
-      <div id="rules"></div>
-    </details>
-  </section>
+  <div class="workspace">
+    <form class="panel" id="screen" autocomplete="off">
+      <div class="panel-head">
+        <div>
+          <h2>แบบคัดกรอง</h2>
+          <p id="picked">ยังไม่ได้เลือกอาการ</p>
+        </div>
+        <button type="button" id="clear">ล้างอาการที่เลือก</button>
+      </div>
+      <div id="form"></div>
+    </form>
+    <section class="panel" id="result" aria-live="polite">
+      <div class="panel-head">
+        <div>
+          <h2>ผลและแผนฟื้นตัว</h2>
+          <p>ป้ายที่ได้ตั้งแต่ 0.40 มีการ์ดแผนด้านล่าง</p>
+        </div>
+      </div>
+      <div class="finding-list" id="results"></div>
+      <p class="section-label">แผนฟื้นตัว</p>
+      <div class="plans" id="plans"></div>
+    </section>
+  </div>
 </main>
 <script>
 const labels = [
@@ -415,7 +499,6 @@ const groups = [
 ];
 
 const symptoms = groups.flatMap((group) => group.items);
-const labelById = Object.fromEntries(labels.map((label) => [label.id, label]));
 const maxWeight = {};
 labels.forEach((label) => { maxWeight[label.id] = 0; });
 symptoms.forEach((symptom) => {
@@ -428,7 +511,6 @@ const form = document.getElementById("form");
 const results = document.getElementById("results");
 const plans = document.getElementById("plans");
 const picked = document.getElementById("picked");
-const rules = document.getElementById("rules");
 
 groups.forEach((group) => {
   const field = document.createElement("fieldset");
@@ -449,26 +531,6 @@ groups.forEach((group) => {
   });
   form.appendChild(field);
 });
-
-const ruleTable = document.createElement("table");
-ruleTable.innerHTML = "<thead><tr><th>อาการ</th><th>น้ำหนักที่บวกให้ป้าย</th></tr></thead>";
-const tbody = document.createElement("tbody");
-symptoms.forEach((symptom) => {
-  const row = document.createElement("tr");
-  const symptomCell = document.createElement("td");
-  symptomCell.textContent = symptom.text;
-  const weightCell = document.createElement("td");
-  weightCell.textContent = Object.entries(symptom.weights).map(([id, weight]) => {
-    const label = labelById[id];
-    return label.column + " +" + weight;
-  }).join(", ");
-  row.append(symptomCell, weightCell);
-  tbody.appendChild(row);
-});
-ruleTable.appendChild(tbody);
-const maxLine = document.createElement("p");
-maxLine.textContent = "น้ำหนักเต็มของแต่ละป้าย: " + labels.map((label) => label.column + " " + maxWeight[label.id]).join(", ");
-rules.append(maxLine, ruleTable);
 
 document.getElementById("clear").addEventListener("click", () => {
   form.querySelectorAll("input").forEach((input) => { input.checked = false; });
@@ -506,46 +568,27 @@ function render() {
     const calc = scoreOf(label.id, chosen);
     const shown = calc.score.toFixed(2);
     const pass = calc.score >= 0.4;
-    if (pass) passing.push({ label, calc, shown });
+    if (pass) passing.push({ label, shown });
 
-    const card = document.createElement("article");
-    card.className = pass ? "result pass" : "result";
-    const head = document.createElement("div");
-    head.className = "result-head";
-    const title = document.createElement("h3");
+    const row = document.createElement("article");
+    row.className = pass ? "finding pass" : "finding";
+    const name = document.createElement("div");
+    name.className = "finding-name";
+    const title = document.createElement("b");
     title.textContent = label.thai;
+    const column = document.createElement("em");
+    column.textContent = label.column;
+    name.append(title, column);
     const score = document.createElement("div");
     score.className = "score";
     score.textContent = shown;
-    head.append(title, score);
-
-    const column = document.createElement("p");
-    column.className = "meta";
-    column.textContent = "ชื่อคอลัมน์ในไฟล์: " + label.column;
-
-    const bar = document.createElement("div");
-    bar.className = "bar";
+    const meter = document.createElement("div");
+    meter.className = "meter";
     const fill = document.createElement("span");
     fill.style.width = Math.round(calc.score * 100) + "%";
-    bar.appendChild(fill);
-
-    const math = document.createElement("p");
-    math.textContent = "น้ำหนัก " + calc.earned + " จาก " + calc.total + " คะแนน " + shown;
-
-    const badge = document.createElement("p");
-    const mark = document.createElement("span");
-    mark.className = "badge";
-    mark.textContent = pass ? "ถึง 0.40 แสดงแผนฟื้นตัวด้านล่าง" : "ยังไม่ถึง 0.40";
-    badge.appendChild(mark);
-
-    card.append(head, column, bar, math, badge);
-    if (calc.parts.length) {
-      const from = document.createElement("p");
-      from.className = "meta";
-      from.textContent = "อาการที่นับ: " + calc.parts.join(" · ");
-      card.appendChild(from);
-    }
-    results.appendChild(card);
+    meter.appendChild(fill);
+    row.append(name, score, meter);
+    results.appendChild(row);
   });
 
   plans.replaceChildren();
@@ -554,7 +597,7 @@ function render() {
     empty.className = "empty";
     empty.textContent = chosen.length
       ? "ยังไม่มีป้ายที่ได้ตั้งแต่ 0.40 จึงยังไม่แสดงแผนฟื้นตัว"
-      : "เลือกอาการด้านบน แล้วแผนฟื้นตัวจะปรากฏเฉพาะป้ายที่คะแนนถึง 0.40";
+      : "เลือกอาการ แล้วแผนฟื้นตัวจะปรากฏเฉพาะป้ายที่คะแนนถึง 0.40";
     plans.appendChild(empty);
     return;
   }
@@ -562,7 +605,10 @@ function render() {
     const card = document.createElement("article");
     card.className = "plan";
     const title = document.createElement("h3");
-    title.textContent = label.thai + " · " + label.column + " · คะแนน " + shown;
+    title.textContent = label.thai + " · " + label.column;
+    const tag = document.createElement("p");
+    tag.className = "score-tag";
+    tag.textContent = shown;
     const list = document.createElement("ul");
     label.steps.forEach((step) => {
       const item = document.createElement("li");
@@ -572,7 +618,7 @@ function render() {
     const note = document.createElement("p");
     note.className = "meta";
     note.textContent = "ข้อความนี้เป็นตัวอย่างในแบบจำลอง ไม่ใช่คำสั่งรักษา";
-    card.append(title, list, note);
+    card.append(title, tag, list, note);
     plans.appendChild(card);
   });
 }
